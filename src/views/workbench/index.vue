@@ -14,7 +14,7 @@
                         <div class="w-20">当前版本</div>
                         <span> {{ workbenchData.version.version }}</span>
                     </div>
-                    <div class="flex leading-9">
+                    <!-- <div class="flex leading-9">
                         <div class="w-20">获取渠道</div>
                         <div>
                             <a :href="workbenchData.version.channel.website" target="_blank">
@@ -28,10 +28,11 @@
                                 <el-button type="danger" size="small">Gitee</el-button>
                             </a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </el-card>
             <el-card class="!border-none mb-4 flex-1" shadow="never">
+
                 <template #header>
                     <div>
                         <span class="card-title">今日数据</span>
@@ -75,15 +76,13 @@
         </div>
         <div class="function mb-4">
             <el-card class="flex-1 !border-none" shadow="never">
+
                 <template #header>
                     <span>常用功能</span>
                 </template>
                 <div class="flex flex-wrap">
-                    <div
-                        v-for="item in workbenchData.menu"
-                        class="md:w-[12.5%] w-1/4 flex flex-col items-center"
-                        :key="item"
-                    >
+                    <div v-for="item in workbenchData.menu" class="md:w-[12.5%] w-1/4 flex flex-col items-center"
+                        :key="item">
                         <router-link :to="item.url" class="mb-3 flex flex-col items-center">
                             <image-contain width="40px" height="40px" :src="item?.image" />
                             <div class="mt-2">{{ item.name }}</div>
@@ -94,29 +93,23 @@
         </div>
         <div class="lg:flex gap-4">
             <el-card class="!border-none mb-4 lg:mb-0 w-full lg:w-2/3" shadow="never">
+
                 <template #header>
                     <span>访问量趋势图</span>
                 </template>
                 <div>
-                    <v-charts
-                        ref="visitorChart"
-                        style="height: 350px"
-                        :option="workbenchData.visitorOption"
-                        :autoresize="true"
-                    />
+                    <v-charts ref="visitorChart" style="height: 350px" :option="workbenchData.visitorOption"
+                        :autoresize="true" />
                 </div>
             </el-card>
             <el-card class="!border-none w-full lg:w-1/3" shadow="never">
+
                 <template #header>
                     <span>销售额趋势图</span>
                 </template>
                 <div>
-                    <v-charts
-                        ref="saleChart"
-                        style="height: 350px"
-                        :option="workbenchData.saleOption"
-                        :autoresize="true"
-                    />
+                    <v-charts ref="saleChart" style="height: 350px" :option="workbenchData.saleOption"
+                        :autoresize="true" />
                 </div>
             </el-card>
         </div>

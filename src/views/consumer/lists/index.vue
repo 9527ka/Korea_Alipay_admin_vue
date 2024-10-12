@@ -63,13 +63,9 @@ import { getUserList } from '@/api/consumer'
 import { ClientMap } from '@/enums/appEnums'
 import { usePaging } from '@/hooks/usePaging'
 import { getRoutePath } from '@/router'
-import Chat from '@/components/chat.vue';
 
 defineComponent({
     name: 'App',
-    components: {
-        Chat
-    }
 });
 
 const queryParams = reactive({

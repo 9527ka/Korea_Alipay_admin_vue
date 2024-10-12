@@ -33,13 +33,9 @@
 
 <script lang="ts" setup name="rechargeConfig">
 import { getRechargeConfig, setRechargeConfig } from '@/api/app/recharge'
-import ChatService from '@/components/chat_service.vue';
 
 defineComponent({
     name: 'App',
-    components: {
-        ChatService
-    }
 });
 const formData = reactive({
     status: 1, //功能状态 1-开启 0-关闭

@@ -47,12 +47,21 @@
                 </button>
             </div>
         </div>
+        <transition name="fade">
+            <div v-if="showModal" class="modal-overlay" @click="showModal = false">
+                <div class="modal-content" @click.stop>
+                    <img :src="imageSrc" alt="放大后的图片" />
+                    <span class="close-btn" @click="showModal = false">&times;</span>
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import feedback from '@/utils/feedback'
+import ImageZoom from '../../components/ImageZoom.vue';
 const activeTab = ref('user'); // 初始状态下显示用户列表
 
 const message = ref('');
@@ -167,6 +176,7 @@ function displayChatData(data: any) {
         }
     }
 }
+
 //添加用户聊天数据
 function addUserHtml(chatData: any) {
     const messageElement = document.createElement('div')
@@ -180,12 +190,18 @@ function addUserHtml(chatData: any) {
         userName = userInfo.name
         messageElement.classList.add('chat-message')
     }
+    var content_txt = content.text
+    //图片类型
+    if (chatData.msg.type == 2) {
+        // content_txt = `<img src="${content.url}" width="${content.w}" height="${content.h}" @click="toggleModal">`
+        content_txt = `<ImageZoom imageSrc="${content.url}" />`
+    }
     messageElement.innerHTML = `<div class="message-header">
         <img src="${face}" class="user-avatar"></div>
         <div class="msg-box">
         <div class="user-name">${userName}</div>
         <div class="msg">
-            <div class="msg-content">${content.text}</div>
+            <div class="msg-content">${content_txt}</div>
         </div>
         </div>`;
     messagesContainer.value.appendChild(messageElement);
