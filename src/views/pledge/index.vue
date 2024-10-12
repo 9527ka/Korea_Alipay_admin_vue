@@ -1,11 +1,7 @@
 <template>
     <div>
         <el-card class="!border-none mb-4" shadow="never">
-            <el-form
-                class="mb-[-16px]"
-                :model="queryParams"
-                inline
-            >
+            <el-form class="mb-[-16px]" :model="queryParams" inline>
                 <el-form-item label="产品名称" prop="name">
                     <el-input class="w-[280px]" v-model="queryParams.name" clearable placeholder="请输入产品名称" />
                 </el-form-item>
@@ -22,11 +18,7 @@
                 </template>
                 新增
             </el-button>
-            <el-button
-                v-perms="['pledge/delete']"
-                :disabled="!selectData.length"
-                @click="handleDelete(selectData)"
-            >
+            <el-button v-perms="['pledge/delete']" :disabled="!selectData.length" @click="handleDelete(selectData)">
                 删除
             </el-button>
             <div class="mt-4">
@@ -37,23 +29,14 @@
                     <el-table-column label="周期(天)" prop="day" show-overflow-tooltip />
                     <el-table-column label="头部标签" prop="label" show-overflow-tooltip />
                     <el-table-column label="标签" prop="explain" show-overflow-tooltip />
-                    <el-table-column label="限额" prop="max_amount" show-overflow-tooltip />
+                    <!-- <el-table-column label="限额" prop="max_amount" show-overflow-tooltip /> -->
                     <el-table-column label="操作" width="120" fixed="right">
+
                         <template #default="{ row }">
-                             <el-button
-                                v-perms="['pledge/edit']"
-                                type="primary"
-                                link
-                                @click="handleEdit(row)"
-                            >
+                            <el-button v-perms="['pledge/edit']" type="primary" link @click="handleEdit(row)">
                                 编辑
                             </el-button>
-                            <el-button
-                                v-perms="['pledge/delete']"
-                                type="danger"
-                                link
-                                @click="handleDelete(row.id)"
-                            >
+                            <el-button v-perms="['pledge/delete']" type="danger" link @click="handleDelete(row.id)">
                                 删除
                             </el-button>
                         </template>
@@ -127,4 +110,3 @@ const handleDelete = async (id: number | any[]) => {
 
 getLists()
 </script>
-

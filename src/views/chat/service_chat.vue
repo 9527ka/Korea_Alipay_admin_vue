@@ -1,30 +1,50 @@
 <template>
     <div class="chat-container">
         <div class="sidebar">
-            <ul class="group-list">
-                <li v-for="u in userBoxData" :key="u.list_id" @click="selectUser(u.list_id)"
-                    :class="{ active: selectedListId === u.list_id }">
-                    <div class="user-box">
-                        <div class="message-header head-box">
-                            <img :src="u.face" class="user-avatar">
-                            <div class="no-read-num" v-if="u.no_reader_num > 0">{{ u.no_reader_num }}</div>
-                        </div>
-                        <div class="name-msg">
-                            <div class="name-time">
-                                <div class="name-txt">{{ u.name }}</div>
-                                <div class="time-txt">{{ formatTime(u.time) }}</div>
-                            </div>
-                            <div class="msg-txt">{{ u.msg }}</div>
-                        </div>
+            <div class="chat-box">
+                <div class="user-group">
+                    <div class="user-box" @click="selectTab('user')" :class="{ active: activeTab === 'user' }">一般客服
                     </div>
-                </li>
-            </ul>
+                    <div class="group-box" @click="selectTab('group')" :class="{ active: activeTab === 'group' }">红包群
+                    </div>
+                </div>
+                <ul class="chat-list" v-show="activeTab === 'user'">
+                    <li v-for="u in userBoxData" :key="u.list_id" @click="selectUser(u.list_id)"
+                        :class="{ active: selectedListId === u.list_id }">
+                        <div class="head-msg">
+                            <div class="message-header head-box">
+                                <img :src="u.face" class="user-avatar">
+                                <div class="no-read-num" v-if="u.no_reader_num > 0">{{ u.no_reader_num }}</div>
+                            </div>
+                            <div class="name-msg">
+                                <div class="name-time">
+                                    <div class="name-txt">{{ u.name }}</div>
+                                    <div class="time-txt">{{ formatTime(u.time) }}</div>
+                                </div>
+                                <div class="msg-txt">{{ u.msg }}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="group-list" v-show="activeTab === 'group'">
+                    <li v-for="group in groupBoxData" :key="group.id" @click="selectGroup(group.id)"
+                        :class="{ active: selectedListId === group.id }">
+                        {{ group.name }}
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="main-content">
             <div id="messages" class="messages"></div>
             <div class="input-group">
-                <input v-model="message" type="text" placeholder="Type your message..." />
-                <button @click="sendMessage">Send</button>
+                <el-input type="textarea" :autosize="{ minRows: 6, maxRows: 6 }" v-model="message" maxlength="200"
+                    show-word-limit clearable />
+                <button @click="sendMessage" class="el-button el-button--primary msg-btn"
+                    :class="{ 'disabled-btn': !selectedListId }" :disabled="isSending">
+                    <text v-if="isSending">发送中...</text>
+                    <text v-else>发送</text>
+                </button>
             </div>
         </div>
     </div>
@@ -32,19 +52,41 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import feedback from '@/utils/feedback'
+const activeTab = ref('user'); // 初始状态下显示用户列表
 
 const message = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
 const ws = ref<WebSocket | null>(null);
-const selectedListId = ref('1429d80efd7b34e024ed34a3f9fd067f'); // 默认选中的群组
+const isSending = ref(false);
+const selectedListId = ref(''); // 默认选中的
 const userBoxData = ref([
     { list_id: '', name: '', 'face': 'https://service.kq5.cc/static/photo/user.png', 'msg': '', 'no_reader_num': 0, 'time': 0 },
+]);
+
+const groupBoxData = ref([
+    { id: '73470c204d434599e991d803212f186f', name: '初级红包小组' },
+    { id: '635db41064cd21052754f24ddda0cb0e', name: '中级红包小组' },
+    { id: '1429d80efd7b34e024ed34a3f9fd067f', name: '高级红包小组' },
 ]);
 
 const _token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo5OCwiaXNzIjoiaW1faHR0cCIsImlhdCI6MTcyODQ0NDAyMywiZXhwIjoxNzY0NzMyMDIzLCJuYmYiOjE3Mjg0NDQwMjMsInN1YiI6IiIsImp0aSI6IjY0ZTJiMjIyY2Y3MDRhM2Q1MjIzNDg4YmVmMjZiYmI5In0.hciiP6XCdkyw-57iuueuONeNG39QocS1ZVeD02i_x4U';
 const _agent_id = 0;
 const content_type = 0;
 
+const selectTab = (tab: any) => {
+    messagesContainer.value.innerHTML = ''
+    selectedListId.value = ''
+    activeTab.value = tab
+    var divTag = '.chat-list li'
+    if (tab == 'group') divTag = '.group-list li';
+    nextTick(() => {
+        const firstLi = document.querySelector(divTag);
+        if (firstLi) {
+            firstLi.click(); // 模拟点击第一个 li 标签
+        }
+    });
+};
 //初始更新会话列表
 async function startChatList() {
     const response = await fetch(`https://service.kq5.cc/im/get/serviceList`, {
@@ -84,7 +126,6 @@ function initWebSocket() {
     ws.value = new WebSocket(`wss://service.kq5.cc/wss`);
 
     ws.value.onopen = () => {
-        console.log('Connected to the server');
         sendTokenVerification();
     };
 
@@ -102,8 +143,6 @@ function initWebSocket() {
         }
         if (data.action === 'chatData') {
             displayChatData(data);
-        } else {
-            displayMessage(data.data);
         }
     };
 
@@ -121,45 +160,65 @@ function sendTokenVerification() {
     }
 }
 
-function displayMessage(message: string) {
-    if (messagesContainer.value) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = message;
-        messagesContainer.value.appendChild(messageElement);
-        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
-    }
-}
-
 function displayChatData(data: any) {
     if (messagesContainer.value) {
-        const chatData = data.data.data;
-        const messageElement = document.createElement('div');
-        const userInfo = chatData.msg.user_info;
-        const content = chatData.msg.content;
-        var face = 'https://service.kq5.cc/static/photo/' + userInfo.face;
-        var no_read_num_txt = ''
-        if (chatData.msg.user_info.uid == 98) {
-            messageElement.classList.add('my-chat-message');
-        } else {
-            messageElement.classList.add('chat-message');
+        if (data.data.data.msg.user_info.uid != 98) {
+            addUserHtml(data.data.data)
         }
-        messageElement.innerHTML = `<div class="message-header">
-            <img src="${face}" class="user-avatar"></div>
-            <div class="msg-box">
-            <div class="user-name">${userInfo.name}</div>
-            <div class="msg">
-                <div class="msg-content">${content.text}</div>
-            </div>
-            </div>`;
-        messagesContainer.value.appendChild(messageElement);
-        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
     }
 }
-
+//添加用户聊天数据
+function addUserHtml(chatData: any) {
+    const messageElement = document.createElement('div')
+    const userInfo = chatData.msg.user_info
+    const content = chatData.msg.content
+    var face = 'https://service.kq5.cc/static/photo/user.png'
+    var userName = 'Amber'
+    if (chatData.msg.user_info.uid == 98) {
+        messageElement.classList.add('my-chat-message')
+    } else {
+        userName = userInfo.name
+        messageElement.classList.add('chat-message')
+    }
+    messageElement.innerHTML = `<div class="message-header">
+        <img src="${face}" class="user-avatar"></div>
+        <div class="msg-box">
+        <div class="user-name">${userName}</div>
+        <div class="msg">
+            <div class="msg-content">${content.text}</div>
+        </div>
+        </div>`;
+    messagesContainer.value.appendChild(messageElement);
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
+}
+//即时添加自己的聊天消息
+function addMyHtml(content: any) {
+    const messageElement = document.createElement('div');
+    var face = 'https://service.kq5.cc/static/photo/user.png';
+    messageElement.classList.add('my-chat-message');
+    messageElement.innerHTML = `<div class="message-header">
+        <img src="${face}" class="user-avatar"></div>
+        <div class="msg-box">
+        <div class="user-name">Amber</div>
+        <div class="msg">
+            <div class="msg-content">${content}</div>
+        </div>
+        </div>`;
+    messagesContainer.value.appendChild(messageElement);
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
+}
 async function sendMessage() {
-    if (!message.value.trim()) return;
+    if (!selectedListId.value) {
+        feedback.msgError(`未选择发送对象`)
+        return
+    }
+    if (!message.value.trim()) {
+        feedback.msgError(`不可发送空消息`)
+        return
+    }
 
     try {
+        isSending.value = true
         const response = await fetch('https://service.kq5.cc/im/message/textMsg', {
             method: 'POST',
             headers: {
@@ -175,8 +234,9 @@ async function sendMessage() {
         });
 
         const data = await response.json();
-        if (data.code === 0) { // 假设 0 是成功状态码
-            displayMessage(`Me: ${message.value}`);
+        isSending.value = false
+        if (data.err === 0) {
+            addMyHtml(message.value);
             message.value = ''; // 清空输入框
         } else {
             console.error('Failed to send message:', data);
@@ -199,32 +259,17 @@ async function getNewChatInfo(listId: string) {
     });
     const res = await response.json();
     if (res.err === 0) {
-        const info = res.data
-        const messageElement = document.createElement('div');
-
-        var face = 'https://service.kq5.cc/static/photo/user.png';
-        messageElement.classList.add('chat-message');
-        messageElement.innerHTML = `<li @click="selectUser(${info.list_id})"
-                    :class="{ active: selectedListId === u.id }">
-                    <div class="user-box">
-                        <div class="message-header head-box">
-                            <img :src="u.face" class="user-avatar">
-                            <div class="no-read-num" v-if="u.no_reader_num > 0">{{ u.no_reader_num }}</div>
-                        </div>
-                        <div class="name-msg">
-                            <div class="name-time">
-                                <div class="name-txt">{{ u.name }}</div>
-                                <div class="time-txt">{{ formatTime(u.time) }}</div>
-                            </div>
-                            <div class="msg-txt">{{ u.msg }}</div>
-                        </div>
-                    </div>
-                </li>`;
-        messagesContainer.value.appendChild(messageElement);
-        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        userBoxData.value.unshift({
+            list_id: res.data.list_id,
+            name: res.data.show_name ?? "新访客",
+            msg: res.data.last_msg,
+            no_reader_num: res.data.no_reader_num,
+            face: res.data.photo_path,
+            time: res.data.time
+        });
     }
 }
-
+//选择用户
 function selectUser(list_id: string) {
     // 更新当前选中的用户ID
     selectedListId.value = list_id;
@@ -236,10 +281,20 @@ function selectUser(list_id: string) {
     }
 
     // 获取当前选中的<li>元素
-    const selectedLi = document.querySelector(`.group-list li[id="${list_id}"]`) as HTMLElement;
+    const selectedLi = document.querySelector(`.chat-list li[id="${list_id}"]`) as HTMLElement;
     if (selectedLi) {
         // 将选中的<li>元素置顶
         selectedLi.parentNode?.insertBefore(selectedLi, selectedLi.parentNode.firstChild);
+    }
+    messagesContainer.value.innerHTML = ''
+    getChatData(list_id);
+}
+//选择群组
+function selectGroup(list_id: string) {
+    selectedListId.value = list_id;
+    // 重置当前聊天记录
+    if (messagesContainer.value) {
+        messagesContainer.value.innerHTML = '';
     }
     getChatData(list_id);
 }
@@ -263,26 +318,8 @@ async function getChatData(listId: string) {
         const res = await response.json();
         if (res.err === 0) {
             const list = res.data.list
-            var face = ''
             list.forEach((v: any) => {
-                const messageElement = document.createElement('div');
-                face = 'https://service.kq5.cc/static/photo/' + v.msg.user_info.face;
-                if (v.msg.user_info.uid == 98) {
-                    messageElement.classList.add('my-chat-message');
-                } else {
-                    face = 'https://service.kq5.cc/static/photo/user.png';
-                    messageElement.classList.add('chat-message');
-                }
-                messageElement.innerHTML = `<div class="message-header">
-                    <img src="${face}" class="user-avatar"></div>
-                    <div class="msg-box">
-                    <div class="user-name">${v.msg.user_info.name}</div>
-                    <div class="msg">
-                        <div class="msg-content">${v.msg.content.text}</div>
-                    </div>
-                    </div>`;
-                messagesContainer.value.appendChild(messageElement);
-                messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+                addUserHtml(v)
             })
         } else {
             console.error('Failed to fetch chat list:', res);
@@ -291,37 +328,10 @@ async function getChatData(listId: string) {
         console.error('Error fetching chat list:', error);
     }
 }
-
-async function fetchChatList(listId: string) {
-    try {
-        const response = await fetch(`https://service.kq5.cc/im/get/chatdanList?list_id=${listId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        const data = await response.json();
-        if (data.err === 0) {
-            const newGroup = {
-                id: data.data.list_id,
-                name: data.data.last_msg,
-                no_reader_num: data.data.no_reader_num,
-                photo_path: data.data.photo_path,
-                time: data.data.time,
-                top: data.data.top,
-                Shield: data.data.Shield,
-                top_time: data.data.top_time,
-                type: data.data.type
-            };
-            userBoxData.value.push(newGroup);
-        } else {
-            console.error('Failed to fetch chat list:', data);
-        }
-    } catch (error) {
-        console.error('Error fetching chat list:', error);
-    }
-}
+//当前是否选择群组对象
+const isGroupSelected = computed(() => {
+    return groupBoxData.value.some(group => group.id === selectedListId.value);
+});
 
 //时间格式化
 function formatTime(timestamp: number) {
@@ -369,6 +379,38 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.user-group {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.user-group div {
+    width: 50%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.disabled-btn {
+    background: #ccc;
+    border: #ccc;
+}
+
+.msg-btn {
+    margin-top: 10px;
+}
+
+.input-group {
+    text-align: right;
+}
+
+.input-group .el-textarea {
+    border: 1px #f0f0f0 solid;
+    border-radius: 5px;
+}
+
 .no-read-num {
     font-size: 11px;
     line-height: 1;
@@ -389,48 +431,52 @@ onBeforeUnmount(() => {
     font-size: 12px;
 }
 
-.user-box {
+.head-msg {
     display: flex;
 }
 
 .chat-container {
     display: flex;
-    height: 100vh;
+    height: 80vh;
     width: 100%;
     max-width: 1000px;
     margin: auto;
+    background: #fff;
 }
 
 .sidebar {
     width: 250px;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid #f0f0f0;
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    height: 400px;
 }
 
-.group-list {
+.group-list,
+.chat-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    overflow-y: auto;
+    height: 74vh;
 }
 
-.group-list li {
-    padding: 0.5rem;
+.group-list li,
+.chat-list li {
+    padding: .8rem .5rem;
     cursor: pointer;
     margin-bottom: 5px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.3s;
 }
 
-.group-list li.active {
+.chat-box .active {
     background-color: #007bff;
     color: white;
 }
 
-.group-list li:hover {
+.group-list li:hover,
+.chat-list li:hover {
     background-color: #f0f0f0;
     color: #007bff;
 }
@@ -440,18 +486,16 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     padding: 1rem;
+    height: 80vh;
 }
 
 .messages {
     flex: 1;
     overflow-y: scroll;
-    border: 1px solid #ccc;
+    border: 1px solid #f0f0f0;
     padding: 1rem;
     margin-bottom: 1rem;
-}
-
-.input-group {
-    display: flex;
+    border-radius: 5px;
 }
 
 input[type="text"] {

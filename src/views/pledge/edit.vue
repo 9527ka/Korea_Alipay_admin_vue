@@ -1,13 +1,7 @@
 <template>
     <div class="edit-popup">
-        <popup
-            ref="popupRef"
-            :title="popupTitle"
-            :async="true"
-            width="550px"
-            @confirm="handleSubmit"
-            @close="handleClose"
-        >
+        <popup ref="popupRef" :title="popupTitle" :async="true" width="550px" @confirm="handleSubmit"
+            @close="handleClose">
             <el-form ref="formRef" :model="formData" label-width="90px" :rules="formRules">
                 <el-form-item label="产品名称" prop="name">
                     <el-input v-model="formData.name" clearable placeholder="请输入产品名称" />
@@ -24,9 +18,9 @@
                 <el-form-item label="标签" prop="explain">
                     <el-input v-model="formData.explain" clearable placeholder="请输入标签" />
                 </el-form-item>
-                <el-form-item label="限额" prop="max_amount">
+                <!-- <el-form-item label="限额" prop="max_amount">
                     <el-input v-model="formData.max_amount" clearable placeholder="请输入限额" />
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
         </popup>
     </div>
@@ -110,8 +104,8 @@ const setFormData = async (data: Record<any, any>) => {
             formData[key] = data[key]
         }
     }
-    
-    
+
+
 }
 
 const getDetail = async (row: Record<string, any>) => {
@@ -125,9 +119,9 @@ const getDetail = async (row: Record<string, any>) => {
 // 提交按钮
 const handleSubmit = async () => {
     await formRef.value?.validate()
-    const data = { ...formData,  }
-    mode.value == 'edit' 
-        ? await apiPledgeEdit(data) 
+    const data = { ...formData, }
+    mode.value == 'edit'
+        ? await apiPledgeEdit(data)
         : await apiPledgeAdd(data)
     popupRef.value?.close()
     emit('success')

@@ -1,11 +1,7 @@
 <template>
     <div>
         <el-card class="!border-none mb-4" shadow="never">
-            <el-form
-                class="mb-[-16px]"
-                :model="queryParams"
-                inline
-            >
+            <el-form class="mb-[-16px]" :model="queryParams" inline>
                 <el-form-item label="产品id" prop="pledge_id">
                     <el-input class="w-[280px]" v-model="queryParams.pledge_id" clearable placeholder="请输入产品id" />
                 </el-form-item>
@@ -13,21 +9,15 @@
                     <el-input class="w-[280px]" v-model="queryParams.user_id" clearable placeholder="请输入用户id" />
                 </el-form-item>
                 <el-form-item label="创建时间" prop="create_time">
-                    <daterange-picker
-                        v-model:startTime="queryParams.start_time"
-                        v-model:endTime="queryParams.end_time"
-                    />
+                    <daterange-picker v-model:startTime="queryParams.start_time"
+                        v-model:endTime="queryParams.end_time" />
                 </el-form-item>
-                
+
                 <el-form-item label="质押状态" prop="status">
                     <el-select class="w-[280px]" v-model="queryParams.status" clearable placeholder="请选择质押状态">
                         <el-option label="全部" value=""></el-option>
-                        <el-option 
-                            v-for="(item, index) in dictData.pledge_status"
-                            :key="index" 
-                            :label="item.name"
-                            :value="item.value"
-                        />
+                        <el-option v-for="(item, index) in dictData.pledge_status" :key="index" :label="item.name"
+                            :value="item.value" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -37,17 +27,14 @@
             </el-form>
         </el-card>
         <el-card class="!border-none" v-loading="pager.loading" shadow="never">
-            <el-button v-perms="['pledge_order/add']" type="primary" @click="handleAdd">
+            <!-- <el-button v-perms="['pledge_order/add']" type="primary" @click="handleAdd">
                 <template #icon>
                     <icon name="el-icon-Plus" />
                 </template>
-                新增
-            </el-button>
-            <el-button
-                v-perms="['pledge_order/delete']"
-                :disabled="!selectData.length"
-                @click="handleDelete(selectData)"
-            >
+新增
+</el-button> -->
+            <el-button v-perms="['pledge_order/delete']" :disabled="!selectData.length"
+                @click="handleDelete(selectData)">
                 删除
             </el-button>
             <div class="mt-4">
@@ -58,18 +45,20 @@
                     <el-table-column label="利率%" prop="rate" show-overflow-tooltip />
                     <el-table-column label="质押金额" prop="amount" show-overflow-tooltip />
                     <el-table-column label="创建时间" prop="create_time">
+
                         <template #default="{ row }">
-                          <span>{{ row.create_time ? timeFormat(row.create_time, 'yyyy-mm-dd hh:MM:ss') : '' }}</span>
+                            <span>{{ row.create_time ? timeFormat(row.create_time, 'yyyy-mm-dd hh:MM:ss') : '' }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="到期时间" prop="expiration_time" show-overflow-tooltip />
                     <el-table-column label="质押状态" prop="status">
+
                         <template #default="{ row }">
                             <dict-value :options="dictData.pledge_status" :value="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column label="返利金额" prop="rebate_amount" show-overflow-tooltip />
-                    <el-table-column label="操作" width="120" fixed="right">
+                    <!-- <el-table-column label="操作" width="120" fixed="right">
                         <template #default="{ row }">
                              <el-button
                                 v-perms="['pledge_order/edit']"
@@ -88,7 +77,7 @@
                                 删除
                             </el-button>
                         </template>
-                    </el-table-column>
+                    </el-table-column> -->
                 </el-table>
             </div>
             <div class="flex mt-4 justify-end">
@@ -163,4 +152,3 @@ const handleDelete = async (id: number | any[]) => {
 
 getLists()
 </script>
-

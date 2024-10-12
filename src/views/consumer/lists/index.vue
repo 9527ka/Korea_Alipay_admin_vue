@@ -30,7 +30,7 @@
                         <el-avatar :src="row.avatar" :size="50" />
                     </template>
 </el-table-column> -->
-                <el-table-column label="手机号码" prop="mobile" min-width="100" />
+                <el-table-column label="手机号" prop="mobile" min-width="100" />
                 <el-table-column label="账号" prop="account" min-width="120" />
                 <!-- <el-table-column label="注册来源" prop="channel" min-width="100" /> -->
                 <el-table-column label="注册时间" prop="create_time" min-width="120" />

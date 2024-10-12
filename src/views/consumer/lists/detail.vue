@@ -6,89 +6,46 @@
         <el-card class="mt-4 !border-none" header="基本资料" shadow="never">
             <el-form ref="formRef" class="ls-form" :model="formData" label-width="120px">
                 <div class="bg-page flex py-5 mb-10 items-center">
-                    <div class="basis-40 flex flex-col justify-center items-center">
+                    <!-- <div class="basis-40 flex flex-col justify-center items-center">
                         <div class="mb-2 text-tx-regular">用户头像</div>
                         <el-avatar :src="formData.avatar" :size="58" />
-                    </div>
+                    </div> -->
                     <div class="basis-40 flex flex-col justify-center items-center">
                         <div class="text-tx-regular">账户余额</div>
                         <div class="mt-2 flex items-center">
                             ¥{{ formData.user_money }}
-                            <el-button
-                                v-perms="['user.user/adjustMoney']"
-                                type="primary"
-                                link
-                                @click="handleAdjust(formData.user_money)"
-                            >
+                            <el-button v-perms="['user.user/adjustMoney']" type="primary" link
+                                @click="handleAdjust(formData.user_money)">
                                 调整
                             </el-button>
                         </div>
                     </div>
                 </div>
-                <el-form-item label="用户昵称：">
+                <!-- <el-form-item label="用户昵称：">
                     {{ formData.nickname }}
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="账号：">
                     {{ formData.account }}
-                    <popover-input
-                        class="ml-[10px]"
-                        @confirm="handleEdit($event, 'account')"
-                        :limit="32"
-                        v-perms="['user.user/edit']"
-                    >
+                    <popover-input class="ml-[10px]" @confirm="handleEdit($event, 'account')" :limit="32"
+                        v-perms="['user.user/edit']">
                         <el-button type="primary" link>
                             <icon name="el-icon-EditPen" />
                         </el-button>
                     </popover-input>
                 </el-form-item>
-                <el-form-item label="真实姓名：">
-                    {{ formData.real_name || '-' }}
-                    <popover-input
-                        class="ml-[10px]"
-                        @confirm="handleEdit($event, 'real_name')"
-                        :limit="32"
-                        v-perms="['user.user/edit']"
-                    >
-                        <el-button type="primary" link>
-                            <icon name="el-icon-EditPen" />
-                        </el-button>
-                    </popover-input>
-                </el-form-item>
-                <el-form-item label="性别：">
-                    {{ formData.sex }}
-                    <popover-input
-                        class="ml-[10px]"
-                        type="select"
-                        :options="[
-                            {
-                                label: '未知',
-                                value: 0
-                            },
-                            {
-                                label: '男',
-                                value: 1
-                            },
-                            {
-                                label: '女',
-                                value: 2
-                            }
-                        ]"
-                        @confirm="handleEdit($event, 'sex')"
-                        v-perms="['user.user/edit']"
-                    >
-                        <el-button type="primary" link>
-                            <icon name="el-icon-EditPen" />
-                        </el-button>
-                    </popover-input>
-                </el-form-item>
-                <el-form-item label="联系电话：">
+                <el-form-item label="手机号：">
                     {{ formData.mobile || '-' }}
-                    <popover-input
-                        class="ml-[10px]"
-                        type="number"
-                        @confirm="handleEdit($event, 'mobile')"
-                        v-perms="['user.user/edit']"
-                    >
+                    <popover-input class="ml-[10px]" type="number" @confirm="handleEdit($event, 'mobile')"
+                        v-perms="['user.user/edit']">
+                        <el-button type="primary" link>
+                            <icon name="el-icon-EditPen" />
+                        </el-button>
+                    </popover-input>
+                </el-form-item>
+                <el-form-item label="密码：">
+                    ******
+                    <popover-input class="ml-[10px]" @confirm="handleEdit($event, 'password')" :limit="32"
+                        v-perms="['user.user/edit']">
                         <el-button type="primary" link>
                             <icon name="el-icon-EditPen" />
                         </el-button>
@@ -100,11 +57,7 @@
             </el-form>
         </el-card>
 
-        <account-adjust
-            v-model:show="adjustState.show"
-            :value="adjustState.value"
-            @confirm="handleConfirmAdjust"
-        />
+        <account-adjust v-model:show="adjustState.show" :value="adjustState.value" @confirm="handleConfirmAdjust" />
     </div>
 </template>
 

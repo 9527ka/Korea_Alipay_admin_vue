@@ -14,3 +14,7 @@ export function getWorkbench() {
 export function getDictData(params: any) {
     return request.get({ url: '/config/dict', params })
 }
+//获取聊天列表
+// export function getChatList(list_id,token) {
+//     return request.post({ url: '/config/dict', params })
+// }

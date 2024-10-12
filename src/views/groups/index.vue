@@ -1,11 +1,7 @@
 <template>
     <div>
         <el-card class="!border-none mb-4" shadow="never">
-            <el-form
-                class="mb-[-16px]"
-                :model="queryParams"
-                inline
-            >
+            <el-form class="mb-[-16px]" :model="queryParams" inline>
                 <el-form-item label="群名称" prop="name">
                     <el-input class="w-[280px]" v-model="queryParams.name" clearable placeholder="请输入群名称" />
                 </el-form-item>
@@ -16,19 +12,15 @@
             </el-form>
         </el-card>
         <el-card class="!border-none" v-loading="pager.loading" shadow="never">
-            <el-button v-perms="['groups/add']" type="primary" @click="handleAdd">
+            <!-- <el-button v-perms="['groups/add']" type="primary" @click="handleAdd">
                 <template #icon>
                     <icon name="el-icon-Plus" />
                 </template>
-                新增
-            </el-button>
-            <el-button
-                v-perms="['groups/delete']"
-                :disabled="!selectData.length"
-                @click="handleDelete(selectData)"
-            >
-                删除
-            </el-button>
+新增
+</el-button>
+<el-button v-perms="['groups/delete']" :disabled="!selectData.length" @click="handleDelete(selectData)">
+    删除
+</el-button> -->
             <div class="mt-4">
                 <el-table :data="pager.lists" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
@@ -38,25 +30,16 @@
                     <el-table-column label="红包金额" prop="limit_money" show-overflow-tooltip />
                     <el-table-column label="红包数量" prop="limit_num" show-overflow-tooltip />
                     <el-table-column label="用户数量" prop="user_count" show-overflow-tooltip />
-                    <el-table-column label="创建时间" prop="create_time" show-overflow-tooltip />
+                    <!-- <el-table-column label="创建时间" prop="create_time" show-overflow-tooltip /> -->
                     <el-table-column label="操作" width="120" fixed="right">
+
                         <template #default="{ row }">
-                             <el-button
-                                v-perms="['groups/edit']"
-                                type="primary"
-                                link
-                                @click="handleEdit(row)"
-                            >
+                            <el-button v-perms="['groups/edit']" type="primary" link @click="handleEdit(row)">
                                 编辑
                             </el-button>
-                            <el-button
-                                v-perms="['groups/delete']"
-                                type="danger"
-                                link
-                                @click="handleDelete(row.id)"
-                            >
+                            <!-- <el-button v-perms="['groups/delete']" type="danger" link @click="handleDelete(row.id)">
                                 删除
-                            </el-button>
+                            </el-button> -->
                         </template>
                     </el-table-column>
                 </el-table>
@@ -128,4 +111,3 @@ const handleDelete = async (id: number | any[]) => {
 
 getLists()
 </script>
-
