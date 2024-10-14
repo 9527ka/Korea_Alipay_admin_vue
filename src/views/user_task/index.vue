@@ -1,23 +1,15 @@
 <template>
     <div>
         <el-card class="!border-none mb-4" shadow="never">
-            <el-form
-                class="mb-[-16px]"
-                :model="queryParams"
-                inline
-            >
+            <el-form class="mb-[-16px]" :model="queryParams" inline>
                 <el-form-item label="用户id" prop="user_id">
                     <el-input class="w-[280px]" v-model="queryParams.user_id" clearable placeholder="请输入用户id" />
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
                     <el-select class="w-[280px]" v-model="queryParams.status" clearable placeholder="请选择状态">
                         <el-option label="全部" value=""></el-option>
-                        <el-option 
-                            v-for="(item, index) in dictData.task_status"
-                            :key="index" 
-                            :label="item.name"
-                            :value="item.value"
-                        />
+                        <el-option v-for="(item, index) in dictData.task_status" :key="index" :label="item.name"
+                            :value="item.value" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -27,50 +19,38 @@
             </el-form>
         </el-card>
         <el-card class="!border-none" v-loading="pager.loading" shadow="never">
-            <el-button v-perms="['user_task/add']" type="primary" @click="handleAdd">
+            <!-- <el-button v-perms="['user_task/add']" type="primary" @click="handleAdd">
                 <template #icon>
                     <icon name="el-icon-Plus" />
                 </template>
-                新增
-            </el-button>
-            <el-button
-                v-perms="['user_task/delete']"
-                :disabled="!selectData.length"
-                @click="handleDelete(selectData)"
-            >
-                删除
-            </el-button>
+新增
+</el-button>
+<el-button v-perms="['user_task/delete']" :disabled="!selectData.length" @click="handleDelete(selectData)">
+    删除
+</el-button> -->
             <div class="mt-4">
                 <el-table :data="pager.lists" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
-                    <el-table-column label="用户id" prop="user_id" show-overflow-tooltip />
-                    <el-table-column label="任务id" prop="task_id" show-overflow-tooltip />
+                    <el-table-column label="用户" prop="mobile" show-overflow-tooltip />
+                    <el-table-column label="任务" prop="title" show-overflow-tooltip />
                     <el-table-column label="完成次数" prop="task_num" show-overflow-tooltip />
                     <el-table-column label="状态" prop="status">
+
                         <template #default="{ row }">
                             <dict-value :options="dictData.task_status" :value="row.status" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="120" fixed="right">
+                    <!-- <el-table-column label="操作" width="120" fixed="right">
+
                         <template #default="{ row }">
-                             <el-button
-                                v-perms="['user_task/edit']"
-                                type="primary"
-                                link
-                                @click="handleEdit(row)"
-                            >
+                            <el-button v-perms="['user_task/edit']" type="primary" link @click="handleEdit(row)">
                                 编辑
                             </el-button>
-                            <el-button
-                                v-perms="['user_task/delete']"
-                                type="danger"
-                                link
-                                @click="handleDelete(row.id)"
-                            >
+                            <el-button v-perms="['user_task/delete']" type="danger" link @click="handleDelete(row.id)">
                                 删除
                             </el-button>
                         </template>
-                    </el-table-column>
+                    </el-table-column> -->
                 </el-table>
             </div>
             <div class="flex mt-4 justify-end">
@@ -141,4 +121,3 @@ const handleDelete = async (id: number | any[]) => {
 
 getLists()
 </script>
-
