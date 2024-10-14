@@ -171,58 +171,16 @@ function sendTokenVerification() {
 
 function displayChatData(data: any) {
     if (messagesContainer.value) {
-        if (data.data.data.msg.user_info.uid != 98) {
-            addUserHtml(data.data.data)
+        if (isGroupSelected()) {
+            addGroupHtml(data.data.data)
+        } else {
+            if (data.data.data.msg.user_info.uid != 98) {
+                addUserHtml(data.data.data)
+            }
         }
     }
 }
 
-//添加用户聊天数据
-function addUserHtml(chatData: any) {
-    const messageElement = document.createElement('div')
-    const userInfo = chatData.msg.user_info
-    const content = chatData.msg.content
-    var face = 'https://service.kq5.cc/static/photo/user.png'
-    var userName = 'Amber'
-    if (chatData.msg.user_info.uid == 98) {
-        messageElement.classList.add('my-chat-message')
-    } else {
-        userName = userInfo.name
-        messageElement.classList.add('chat-message')
-    }
-    var content_txt = content.text
-    //图片类型
-    if (chatData.msg.type == 2) {
-        // content_txt = `<img src="${content.url}" width="${content.w}" height="${content.h}" @click="toggleModal">`
-        content_txt = `<ImageZoom imageSrc="${content.url}" />`
-    }
-    messageElement.innerHTML = `<div class="message-header">
-        <img src="${face}" class="user-avatar"></div>
-        <div class="msg-box">
-        <div class="user-name">${userName}</div>
-        <div class="msg">
-            <div class="msg-content">${content_txt}</div>
-        </div>
-        </div>`;
-    messagesContainer.value.appendChild(messageElement);
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
-}
-//即时添加自己的聊天消息
-function addMyHtml(content: any) {
-    const messageElement = document.createElement('div');
-    var face = 'https://service.kq5.cc/static/photo/user.png';
-    messageElement.classList.add('my-chat-message');
-    messageElement.innerHTML = `<div class="message-header">
-        <img src="${face}" class="user-avatar"></div>
-        <div class="msg-box">
-        <div class="user-name">Amber</div>
-        <div class="msg">
-            <div class="msg-content">${content}</div>
-        </div>
-        </div>`;
-    messagesContainer.value.appendChild(messageElement);
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
-}
 async function sendMessage() {
     if (!selectedListId.value) {
         feedback.msgError(`未选择发送对象`)
@@ -335,7 +293,13 @@ async function getChatData(listId: string) {
         if (res.err === 0) {
             const list = res.data.list
             list.forEach((v: any) => {
-                addUserHtml(v)
+                if (isGroupSelected()) {
+                    addGroupHtml(v)
+                } else {
+                    if (v.msg.user_info.uid != 98) {
+                        addUserHtml(v)
+                    }
+                }
             })
         } else {
             console.error('Failed to fetch chat list:', res);
@@ -345,10 +309,95 @@ async function getChatData(listId: string) {
     }
 }
 //当前是否选择群组对象
-const isGroupSelected = computed(() => {
+function isGroupSelected() {
     return groupBoxData.value.some(group => group.id === selectedListId.value);
-});
+}
 
+//添加群租红包聊天数据
+function addGroupHtml(chatData: any) {
+    const messageElement = document.createElement('div')
+    const userInfo = chatData.msg.user_info
+    const content = chatData.msg.content
+    var face = 'https://service.kq5.cc/static/photo/' + userInfo.face
+    messageElement.classList.add('chat-message')
+    if (chatData.msg.type == 5 || chatData.msg.type == 6 || chatData.msg.type == 7) {
+        var money = '', red_img = '', text_msg = ''
+        if (chatData.msg.type == 7) {
+            money = "此轮红包已结束"
+            text_msg = "最小金额为：" + userInfo.name
+            red_img = "https://service.kq5.cc/static/photo/red_end.png"
+        } else if (chatData.msg.type == 6) {
+            money = "₩" + userInfo.money
+            text_msg = userInfo.name + "成功搶到紅包"
+            red_img = "https://service.kq5.cc/static/photo/red_open.png"
+        } else if (chatData.msg.type == 5) {
+            money = "₩" + content.money;
+            text_msg = "本次红包由" + userInfo.name + "提供"
+            red_img = "https://service.kq5.cc/static/photo/red.png"
+        }
+        messageElement.innerHTML = `<div class="message-header">
+        <img src="${face}" class="user-avatar">
+    </div>
+    <div class="msg-box">
+        <div class="user-name">${userInfo.name}</div>
+        <div class="red-envelope msg">
+        <div class="red red-box"><img src="${red_img}" class="red-img"></div>
+        <div style="text-align: left;padding-left:10px;">
+            <div class="amount">${money}</div>
+            <div class="blessing">${text_msg}</div>
+        </div>
+        </div>
+    </div>`;
+        messagesContainer.value.appendChild(messageElement);
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
+    }
+}
+//添加用户聊天数据
+function addUserHtml(chatData: any) {
+    const messageElement = document.createElement('div')
+    const userInfo = chatData.msg.user_info
+    const content = chatData.msg.content
+    var face = 'https://service.kq5.cc/static/photo/user.png'
+    var userName = 'Amber'
+    if (chatData.msg.user_info.uid == 98) {
+        messageElement.classList.add('my-chat-message')
+    } else {
+        userName = userInfo.name
+        messageElement.classList.add('chat-message')
+    }
+    var content_txt = content.text
+    //图片类型
+    if (chatData.msg.type == 2) {
+        // content_txt = `<img src="${content.url}" width="${content.w}" height="${content.h}" @click="toggleModal">`
+        content_txt = `<ImageZoom imageSrc="${content.url}" />`
+    }
+    messageElement.innerHTML = `<div class="message-header">
+        <img src="${face}" class="user-avatar"></div>
+        <div class="msg-box">
+        <div class="user-name">${userName}</div>
+        <div class="msg">
+            <div class="msg-content">${content_txt}</div>
+        </div>
+        </div>`;
+    messagesContainer.value.appendChild(messageElement);
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
+}
+//即时添加自己的聊天消息
+function addMyHtml(content: any) {
+    const messageElement = document.createElement('div');
+    var face = 'https://service.kq5.cc/static/photo/user.png';
+    messageElement.classList.add('my-chat-message');
+    messageElement.innerHTML = `<div class="message-header">
+        <img src="${face}" class="user-avatar"></div>
+        <div class="msg-box">
+        <div class="user-name">Amber</div>
+        <div class="msg">
+            <div class="msg-content">${content}</div>
+        </div>
+        </div>`;
+    messagesContainer.value.appendChild(messageElement);
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
+}
 //时间格式化
 function formatTime(timestamp: number) {
     // 计算属性：时间戳转换
@@ -395,6 +444,30 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.red-box {
+    background: #ffffff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 58px;
+}
+
+.red-img {
+    width: 31px;
+    text-align: center;
+    display: inline;
+    vertical-align: sub;
+}
+
+.red-envelope {
+    text-align: center;
+    display: flex;
+    width: 270px;
+}
+
+
+
 .user-group {
     display: flex;
     margin-bottom: 10px;
@@ -585,23 +658,19 @@ button {
     top: -10px;
 }
 
-.red-envelope {
-    background-color: #ffcccc;
-    padding: 1rem;
-    border-radius: 5px;
-    text-align: center;
-}
-
 .blessing {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 14px;
     margin-bottom: 0.5rem;
 }
 
 .amount {
-    font-size: 1.5rem;
-    color: #ff0000;
-    margin-bottom: 0.5rem;
+    font-size: 18px;
+    color: #c82d36;
+}
+
+.number {
+    font-size: 0.9rem;
+    color: #666;
 }
 
 .red-box {
@@ -609,11 +678,6 @@ button {
     width: 50px;
     height: 50px;
     position: relative;
-}
-
-.red-img {
-    width: 100%;
-    height: 100%;
 }
 
 .user-name {

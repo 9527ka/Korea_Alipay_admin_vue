@@ -39,3 +39,13 @@ export function refundLog(params?: any) {
 export function refundStat(params?: any) {
     return request.get({ url: '/finance.refund/stat', params })
 }
+
+//充值审核
+export function apiRechargeOrderCheck(params?: any) {
+    return request.get({ url: '/recharge.recharge/check', params })
+}
+
+//提现审核
+export function apiWithdrawalOrderCheck(params?: any) {
+    return request.get({ url: '/finance.refund/check', params })
+}
