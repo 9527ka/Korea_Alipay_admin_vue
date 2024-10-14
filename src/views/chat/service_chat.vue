@@ -61,13 +61,15 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import feedback from '@/utils/feedback'
-import ImageZoom from '../../components/ImageZoom.vue';
 const activeTab = ref('user'); // 初始状态下显示用户列表
 
 const message = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
 const ws = ref<WebSocket | null>(null);
 const isSending = ref(false);
+const showModal = ref(false);
+const isModalVisible = ref(false);
+const imageSrc = ''
 const selectedListId = ref(''); // 默认选中的
 const userBoxData = ref([
     { list_id: '', name: '', 'face': 'https://service.kq5.cc/static/photo/user.png', 'msg': '', 'no_reader_num': 0, 'time': 0 },
@@ -147,7 +149,7 @@ function initWebSocket() {
             getNewChatInfo(data.data.list_id);
             return;
         }
-        if (data.data.list_id !== selectedListId.value) {
+        if (data.list_id !== selectedListId.value) {
             return;
         }
         if (data.action === 'chatData') {
@@ -170,14 +172,19 @@ function sendTokenVerification() {
 }
 
 function displayChatData(data: any) {
+    var d = data.data.data
     if (messagesContainer.value) {
-        if (isGroupSelected()) {
-            addGroupHtml(data.data.data)
+        // if (isGroupSelected()) {
+        if (d.msg.type == 5 || d.msg.type == 6 || d.msg.type == 7) {
+            addGroupHtml(d)
         } else {
-            if (data.data.data.msg.user_info.uid != 98) {
-                addUserHtml(data.data.data)
-            }
+            addUserHtml(d)
         }
+        // } else {
+        //     if (d.msg.user_info.uid != 98) {
+        //         addUserHtml(d)
+        //     }
+        // }
     }
 }
 
@@ -293,13 +300,15 @@ async function getChatData(listId: string) {
         if (res.err === 0) {
             const list = res.data.list
             list.forEach((v: any) => {
-                if (isGroupSelected()) {
+                // if (isGroupSelected()) {
+                if (v.msg.type == 5 || v.msg.type == 6 || v.msg.type == 7) {
                     addGroupHtml(v)
                 } else {
-                    if (v.msg.user_info.uid != 98) {
-                        addUserHtml(v)
-                    }
+                    addUserHtml(v)
                 }
+                // } else {
+                //     addUserHtml(v)
+                // }
             })
         } else {
             console.error('Failed to fetch chat list:', res);
@@ -352,6 +361,10 @@ function addGroupHtml(chatData: any) {
         messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
     }
 }
+
+const toggleModal = () => {
+    isModalVisible.value = !isModalVisible.value;
+};
 //添加用户聊天数据
 function addUserHtml(chatData: any) {
     const messageElement = document.createElement('div')
@@ -368,8 +381,7 @@ function addUserHtml(chatData: any) {
     var content_txt = content.text
     //图片类型
     if (chatData.msg.type == 2) {
-        // content_txt = `<img src="${content.url}" width="${content.w}" height="${content.h}" @click="toggleModal">`
-        content_txt = `<ImageZoom imageSrc="${content.url}" />`
+        content_txt = `<img src="${content.url}" width="${content.w}" height="${content.h}">`
     }
     messageElement.innerHTML = `<div class="message-header">
         <img src="${face}" class="user-avatar"></div>
@@ -379,6 +391,7 @@ function addUserHtml(chatData: any) {
             <div class="msg-content">${content_txt}</div>
         </div>
         </div>`;
+    messageElement.querySelector('img').addEventListener('click', toggleModal);
     messagesContainer.value.appendChild(messageElement);
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; // 自动滚动到底部
 }
