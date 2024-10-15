@@ -13,7 +13,7 @@
                     <div class="basis-40 flex flex-col justify-center items-center">
                         <div class="text-tx-regular">账户余额</div>
                         <div class="mt-2 flex items-center">
-                            ¥{{ formData.user_money }}
+                            ₩{{ formData.user_money }}
                             <el-button v-perms="['user.user/adjustMoney']" type="primary" link
                                 @click="handleAdjust(formData.user_money)">
                                 调整

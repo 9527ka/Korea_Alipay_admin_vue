@@ -3,19 +3,19 @@
         <el-card class="!border-none mb-4" shadow="never">
             <div class="flex flex-wrap">
                 <div class="w-1/2 md:w-1/4">
-                    <div class="leading-10">累计提现金额 (元)</div>
+                    <div class="leading-10">累计提现金额 (₩)</div>
                     <div class="text-6xl">{{ refundData.total }}</div>
                 </div>
                 <div class="w-1/2 md:w-1/4">
-                    <div class="leading-10">提现中金额 (元)</div>
+                    <div class="leading-10">提现中金额 (₩)</div>
                     <div class="text-6xl">{{ refundData.ing }}</div>
                 </div>
                 <div class="w-1/2 md:w-1/4">
-                    <div class="leading-10">提现成功金额 (元)</div>
+                    <div class="leading-10">提现成功金额 (₩)</div>
                     <div class="text-6xl">{{ refundData.success }}</div>
                 </div>
                 <div class="w-1/2 md:w-1/4">
-                    <div class="leading-10">提现失败金额 (元)</div>
+                    <div class="leading-10">提现失败金额 (₩)</div>
                     <div class="text-6xl">{{ refundData.error }}</div>
                 </div>
             </div>
@@ -58,19 +58,14 @@
                     :label="`${item.name}(${pager.extend[item.numKey] ?? 0})`" :name="index" :key="index">
                     <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                         <el-table-column label="提现单号" prop="sn" min-width="190" />
-                        <el-table-column label="用户信息" min-width="160">
-                            <template #default="{ row }">
-                                <div class="flex items-center">
-                                    <image-contain class="flex-none mr-2" :src="row.avatar" :width="40" :height="40"
-                                        preview-teleported fit="contain" />
-                                    {{ row.nickname }}
-                                </div>
-                            </template>
-                        </el-table-column>
+                        <el-table-column label="账号" min-width="160" prop="account" />
                         <!-- <el-table-column label="来源单号" prop="order_sn" min-width="190" /> -->
                         <el-table-column label="提现金额" min-width="100">
 
-                            <template #default="{ row }"> ¥ {{ row.order_amount }} </template>
+                            <template #default="{ row }">
+                                ₩ {{ row.order_amount }} <br>
+                                $&nbsp;&nbsp;{{ row.usdt }}
+                            </template>
                         </el-table-column>
 
                         <el-table-column label="提现类型" prop="refund_type_text" min-width="100" />

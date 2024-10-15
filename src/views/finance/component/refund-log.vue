@@ -4,9 +4,10 @@
             <el-table size="large" v-loading="loading" :data="logLists" height="500">
                 <el-table-column label="流水单号" prop="sn" min-width="190" />
                 <el-table-column label="退款金额" min-width="110">
-                    <template #default="{ row }"> ¥{{ row.refund_amount }} </template>
+                    <template #default="{ row }"> ₩{{ row.refund_amount }} </template>
                 </el-table-column>
                 <el-table-column label="退款状态" prop="" min-width="100">
+
                     <template #default="{ row }">
                         <el-tag type="warning" v-if="row.refund_status == 0">
                             {{ row.refund_status_text }}

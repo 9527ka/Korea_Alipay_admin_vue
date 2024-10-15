@@ -1,15 +1,8 @@
 <template>
-    <popup
-        ref="popupRef"
-        title="余额调整"
-        width="500px"
-        @confirm="handleConfirm"
-        :async="true"
-        @close="popupClose"
-    >
+    <popup ref="popupRef" title="余额调整" width="500px" @confirm="handleConfirm" :async="true" @close="popupClose">
         <div class="pr-8">
             <el-form ref="formRef" :model="formData" label-width="120px" :rules="formRules">
-                <el-form-item label="当前余额">¥ {{ value }} </el-form-item>
+                <el-form-item label="当前余额">₩ {{ value }} </el-form-item>
                 <el-form-item label="余额增减" required prop="action">
                     <el-radio-group v-model="formData.action">
                         <el-radio :value="1">增加余额</el-radio>
@@ -17,14 +10,10 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="调整余额" prop="num">
-                    <el-input
-                        :model-value="formData.num"
-                        placeholder="请输入调整的金额"
-                        type="number"
-                        @input="numberValidate"
-                    />
+                    <el-input :model-value="formData.num" placeholder="请输入调整的金额" type="number"
+                        @input="numberValidate" />
                 </el-form-item>
-                <el-form-item label="调整后余额"> ¥ {{ adjustmentMoney }} </el-form-item>
+                <el-form-item label="调整后余额"> ₩ {{ adjustmentMoney }} </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="formData.remark" type="textarea" :rows="4" />
                 </el-form-item>
@@ -32,6 +21,7 @@
         </div>
     </popup>
 </template>
+
 <script lang="ts" setup>
 import type { FormInstance, FormRules } from 'element-plus'
 

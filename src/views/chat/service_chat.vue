@@ -149,18 +149,49 @@ function initWebSocket() {
             getNewChatInfo(data.data.list_id);
             return;
         }
+        //消息列表排序
+        if (data.action === 'chatData') {
+            handleChatData(data.data)
+        }
+
+        console.log(data.data.list_id + '!==' + selectedListId.value)
+
         if (data.list_id !== selectedListId.value) {
             return;
         }
+
         if (data.action === 'chatData') {
-            displayChatData(data);
+            displayChatData(data)
         }
     };
 
-    ws.value.onclose = () => console.log('Disconnected from the server');
+    ws.value.onclose = () => {
+        console.log('Disconnected from the server');
+        setTimeout(initWebSocket, 5000);
+    };
     ws.value.onerror = (error) => console.error('Error:', error);
 }
 
+function handleChatData(data: any) {
+    const listId = data.list_id;
+    const chatData = data.data.msg;
+
+    // 更新 userBoxData 中对应 list_id 的数据
+    const existingUser = userBoxData.value.find(u => u.list_id === listId);
+
+    if (existingUser) {
+        // 更新未读消息数
+        if (listId !== selectedListId.value) {
+            existingUser.no_reader_num += 1
+        }
+        // 更新最新消息
+        existingUser.msg = chatData.content.text;
+        existingUser.time = chatData.time;
+
+        // 将该用户移到数组的最前面
+        userBoxData.value = [existingUser, ...userBoxData.value.filter(u => u.list_id !== listId)];
+    }
+}
 function sendTokenVerification() {
     if (ws.value) {
         const tokenData = {
@@ -172,19 +203,14 @@ function sendTokenVerification() {
 }
 
 function displayChatData(data: any) {
+    handleChatData(data)
     var d = data.data.data
     if (messagesContainer.value) {
-        // if (isGroupSelected()) {
         if (d.msg.type == 5 || d.msg.type == 6 || d.msg.type == 7) {
             addGroupHtml(d)
         } else {
             addUserHtml(d)
         }
-        // } else {
-        //     if (d.msg.user_info.uid != 98) {
-        //         addUserHtml(d)
-        //     }
-        // }
     }
 }
 
@@ -300,15 +326,11 @@ async function getChatData(listId: string) {
         if (res.err === 0) {
             const list = res.data.list
             list.forEach((v: any) => {
-                // if (isGroupSelected()) {
                 if (v.msg.type == 5 || v.msg.type == 6 || v.msg.type == 7) {
                     addGroupHtml(v)
                 } else {
                     addUserHtml(v)
                 }
-                // } else {
-                //     addUserHtml(v)
-                // }
             })
         } else {
             console.error('Failed to fetch chat list:', res);

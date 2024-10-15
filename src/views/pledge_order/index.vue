@@ -2,11 +2,11 @@
     <div>
         <el-card class="!border-none mb-4" shadow="never">
             <el-form class="mb-[-16px]" :model="queryParams" inline>
-                <el-form-item label="产品id" prop="pledge_id">
+                <!-- <el-form-item label="产品id" prop="pledge_id">
                     <el-input class="w-[280px]" v-model="queryParams.pledge_id" clearable placeholder="请输入产品id" />
-                </el-form-item>
-                <el-form-item label="用户id" prop="user_id">
-                    <el-input class="w-[280px]" v-model="queryParams.user_id" clearable placeholder="请输入用户id" />
+                </el-form-item> -->
+                <el-form-item label="用户账号" prop="user_id">
+                    <el-input class="w-[280px]" v-model="queryParams.account" clearable placeholder="请输入用户账号" />
                 </el-form-item>
                 <el-form-item label="创建时间" prop="create_time">
                     <daterange-picker v-model:startTime="queryParams.start_time"
@@ -40,8 +40,8 @@
             <div class="mt-4">
                 <el-table :data="pager.lists" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
-                    <el-table-column label="产品id" prop="pledge_id" show-overflow-tooltip />
-                    <el-table-column label="用户id" prop="user_id" show-overflow-tooltip />
+                    <el-table-column label="产品" prop="name" show-overflow-tooltip />
+                    <el-table-column label="用户账号" prop="account" show-overflow-tooltip />
                     <el-table-column label="利率%" prop="rate" show-overflow-tooltip />
                     <el-table-column label="质押金额" prop="amount" show-overflow-tooltip />
                     <el-table-column label="创建时间" prop="create_time">
@@ -100,11 +100,10 @@ const editRef = shallowRef<InstanceType<typeof EditPopup>>()
 // 是否显示编辑框
 const showEdit = ref(false)
 
-
 // 查询条件
 const queryParams = reactive({
     pledge_id: '',
-    user_id: '',
+    account: '',
     create_time: '',
     status: '',
     start_time: '',

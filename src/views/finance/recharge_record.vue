@@ -38,17 +38,14 @@
         </el-card>
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
-                <el-table-column label="用户信息" min-width="160">
-                    <template #default="{ row }">
-                        <div class="flex items-center">
-                            <image-contain class="flex-none mr-2" :src="row.avatar" :width="40" :height="40"
-                                preview-teleported fit="contain" />
-                            {{ row.nickname }}
-                        </div>
-                    </template>
-                </el-table-column>
+                <el-table-column label="账号" min-width="160" prop="account" />
                 <el-table-column label="充值单号" prop="sn" min-width="190" />
-                <el-table-column label="充值金额" prop="order_amount" min-width="100">
+                <el-table-column label="充值金额" min-width="100">
+
+                    <template #default="{ row }">
+                        ₩ {{ row.order_amount }} <br>
+                        $&nbsp;&nbsp;{{ row.usdt }}
+                    </template>
                 </el-table-column>
                 <el-table-column label="支付方式" prop="pay_way_text" min-width="100" />
                 <el-table-column label="支付凭证" prop="pay_img">

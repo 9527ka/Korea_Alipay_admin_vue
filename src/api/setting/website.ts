@@ -16,6 +16,14 @@ export function getWebsite() {
 export function setWebsite(params: any) {
     return request.post({ url: '/setting.web.web_setting/setWebsite', params })
 }
+//获取支付信息
+export function getConfigPay() {
+    return request.get({ url: '/setting.web.web_setting/getConfigPay' })
+}
+//设置支付信息
+export function setConfigPay(params: any) {
+    return request.post({ url: '/setting.web.web_setting/setConfigPay', params })
+}
 
 // 获取政策协议
 export function getProtocol() {

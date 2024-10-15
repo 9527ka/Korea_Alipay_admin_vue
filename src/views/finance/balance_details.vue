@@ -1,37 +1,22 @@
 <template>
     <div>
         <el-card class="!border-none" shadow="never">
-            <el-alert
-                type="warning"
-                title="温馨提示：用户账户变动记录"
-                :closable="false"
-                show-icon
-            ></el-alert>
+            <el-alert type="warning" title="温馨提示：用户账户变动记录" :closable="false" show-icon></el-alert>
             <el-form ref="formRef" class="mb-[-16px] mt-[16px]" :model="queryParams" :inline="true">
                 <el-form-item class="w-[280px]" label="用户信息">
-                    <el-input
-                        v-model="queryParams.user_info"
-                        placeholder="请输入用户账号/昵称/手机号"
-                        clearable
-                        @keyup.enter="resetPage"
-                    />
+                    <el-input v-model="queryParams.user_info" placeholder="请输入用户账号" clearable
+                        @keyup.enter="resetPage" />
                 </el-form-item>
                 <el-form-item class="w-[280px]" label="变动类型">
                     <el-select v-model="queryParams.change_type">
                         <el-option label="全部" value />
-                        <el-option
-                            v-for="(value, key) in optionsData.change_type"
-                            :key="key"
-                            :label="value"
-                            :value="key"
-                        />
+                        <el-option v-for="(value, key) in optionsData.change_type" :key="key" :label="value"
+                            :value="key" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="记录时间">
-                    <daterange-picker
-                        v-model:startTime="queryParams.start_time"
-                        v-model:endTime="queryParams.end_time"
-                    />
+                    <daterange-picker v-model:startTime="queryParams.start_time"
+                        v-model:endTime="queryParams.end_time" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="resetPage">查询</el-button>
@@ -42,7 +27,7 @@
         <el-card class="!border-none mt-4" shadow="never">
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="用户账号" prop="account" min-width="100" />
-                <el-table-column label="用户昵称" min-width="160">
+                <!-- <el-table-column label="用户昵称" min-width="160">
                     <template #default="{ row }">
                         <div class="flex items-center">
                             <image-contain
@@ -56,9 +41,10 @@
                             {{ row.nickname }}
                         </div>
                     </template>
-                </el-table-column>
-                <el-table-column label="手机号码" prop="mobile" min-width="100" />
+</el-table-column>
+<el-table-column label="手机号码" prop="mobile" min-width="100" /> -->
                 <el-table-column label="变动金额" prop="change_amount" min-width="100">
+
                     <template #default="{ row }">
                         <span :class="{ 'text-error': row.action == 2 }">
                             {{ row.change_amount }}
@@ -77,6 +63,7 @@
         </el-card>
     </div>
 </template>
+
 <script lang="ts" setup name="balanceDetail">
 import { accountLog, getUmChangeType } from '@/api/finance'
 import { useDictOptions } from '@/hooks/useDictOptions'

@@ -24,8 +24,8 @@
             <div class="mt-4">
                 <el-table :data="pager.lists" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
-                    <el-table-column label="群id" prop="list_id" show-overflow-tooltip />
-                    <el-table-column label="群主id" prop="main_id" show-overflow-tooltip />
+                    <!-- <el-table-column label="群id" prop="list_id" show-overflow-tooltip />
+                    <el-table-column label="群主id" prop="main_id" show-overflow-tooltip /> -->
                     <el-table-column label="群名称" prop="name" show-overflow-tooltip />
                     <el-table-column label="红包金额" prop="limit_money" show-overflow-tooltip />
                     <el-table-column label="红包数量" prop="limit_num" show-overflow-tooltip />
