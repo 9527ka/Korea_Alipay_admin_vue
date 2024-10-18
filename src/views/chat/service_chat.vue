@@ -61,6 +61,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import feedback from '@/utils/feedback'
+import { serviceList } from '@/api/chat'
 const activeTab = ref('user'); // 初始状态下显示用户列表
 
 const message = ref('');
@@ -100,33 +101,18 @@ const selectTab = (tab: any) => {
 };
 //初始更新会话列表
 async function startChatList() {
-    const response = await fetch(`https://service.kq5.cc/im/get/serviceList`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-            _token: _token,
-            _agent_id: _agent_id.toString()
-        })
-    });
-    const res = await response.json();
-    if (res.err === 0) {
-        const list = res.data
-        userBoxData.value = []
-        list.forEach((v: { list_id: any; show_name: any; last_msg: any; no_reader_num: any; photo_path: any; time: any; }) => {
-            return userBoxData.value.push({
-                list_id: v.list_id,
-                name: v.show_name ?? "新访客",
-                msg: v.last_msg,
-                no_reader_num: v.no_reader_num,
-                face: v.photo_path,
-                time: v.time
-            });
-        })
-    } else {
-        console.error('Failed to fetch chat list:', res);
-    }
+    const list = await serviceList({})
+    userBoxData.value = []
+    list.forEach((v: { list_id: any; show_name: any; last_msg: any; no_reader_num: any; photo_path: any; time: any; }) => {
+        return userBoxData.value.push({
+            list_id: v.list_id,
+            name: v.show_name ?? "新访客",
+            msg: v.last_msg,
+            no_reader_num: v.no_reader_num,
+            face: v.photo_path,
+            time: v.time
+        });
+    })
 }
 
 function initWebSocket() {
@@ -153,10 +139,8 @@ function initWebSocket() {
         if (data.action === 'chatData') {
             handleChatData(data.data)
         }
-
         console.log(data.data.list_id + '!==' + selectedListId.value)
-
-        if (data.list_id !== selectedListId.value) {
+        if (data.data.list_id !== selectedListId.value) {
             return;
         }
 
@@ -185,6 +169,7 @@ function handleChatData(data: any) {
             existingUser.no_reader_num += 1
         }
         // 更新最新消息
+        console.log(chatData.content.text)
         existingUser.msg = chatData.content.text;
         existingUser.time = chatData.time;
 
@@ -203,12 +188,12 @@ function sendTokenVerification() {
 }
 
 function displayChatData(data: any) {
-    handleChatData(data)
     var d = data.data.data
     if (messagesContainer.value) {
         if (d.msg.type == 5 || d.msg.type == 6 || d.msg.type == 7) {
             addGroupHtml(d)
         } else {
+            handleChatData(data)
             addUserHtml(d)
         }
     }
@@ -243,7 +228,7 @@ async function sendMessage() {
         const data = await response.json();
         isSending.value = false
         if (data.err === 0) {
-            addMyHtml(message.value);
+            // addMyHtml(message.value);
             message.value = ''; // 清空输入框
         } else {
             console.error('Failed to send message:', data);
@@ -349,7 +334,8 @@ function addGroupHtml(chatData: any) {
     const messageElement = document.createElement('div')
     const userInfo = chatData.msg.user_info
     const content = chatData.msg.content
-    var face = 'https://service.kq5.cc/static/photo/' + userInfo.face
+    // var face = 'https://service.kq5.cc/static/photo/' + userInfo.face
+    var face = 'https://service.kq5.cc/static/photo/user.png'
     messageElement.classList.add('chat-message')
     if (chatData.msg.type == 5 || chatData.msg.type == 6 || chatData.msg.type == 7) {
         var money = '', red_img = '', text_msg = ''

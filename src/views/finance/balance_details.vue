@@ -3,7 +3,7 @@
         <el-card class="!border-none" shadow="never">
             <el-alert type="warning" title="温馨提示：用户账户变动记录" :closable="false" show-icon></el-alert>
             <el-form ref="formRef" class="mb-[-16px] mt-[16px]" :model="queryParams" :inline="true">
-                <el-form-item class="w-[280px]" label="用户信息">
+                <el-form-item class="w-[280px]" label="用户账号">
                     <el-input v-model="queryParams.user_info" placeholder="请输入用户账号" clearable
                         @keyup.enter="resetPage" />
                 </el-form-item>
@@ -54,7 +54,7 @@
                 <el-table-column label="剩余金额" prop="left_amount" min-width="100" />
                 <el-table-column label="变动类型" prop="change_type_desc" min-width="120" />
 
-                <el-table-column label="来源单号" prop="source_sn" min-width="100" />
+                <!-- <el-table-column label="来源单号" prop="source_sn" min-width="100" /> -->
                 <el-table-column label="记录时间" prop="create_time" min-width="120" />
             </el-table>
             <div class="flex justify-end mt-4">
